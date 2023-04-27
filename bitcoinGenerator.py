@@ -1,10 +1,12 @@
-from bitcoinaddress import Wallet, Seed
+from hdwallet import HDWallet
+import binascii
 import multiprocessing as mp
 import time
 import uuid
 import os
 from random import randrange
 import sys
+import json
 
 class Counter(object):
     def __init__(self, initval=0):
@@ -48,18 +50,20 @@ class Solver:
             + str(int(time.time() * 1000000)) \
 
     def generate(self):
-        seed = Seed(self.random())
-        wallet = Wallet(seed)
-        adr = wallet.address.mainnet.pubaddr1
-        key = wallet.key.mainnet.wif
+        hdwallet = HDWallet()
+        hexSeed = binascii.hexlify(self.random().encode())
+        hdwallet.from_seed(hexSeed)
+        pubAdr = hdwallet.p2pkh_address()
+        wif = hdwallet.wif()
         if self.verbose:
             print(f"Proccess: {self.process}")
-            print(f"Key WIF: {key}")
-            print(f"Key address: {adr}")
-        if adr in self.targets:
+            print(f"Key WIF: {wif}")
+            print(f"Key address: {pubAdr}")
+        if pubAdr in self.targets:
             print("KEY FOUND!!!")
-            print(wallet)
-            self.write(wallet)
+            dump_str = json.dumps(hdwallet.dumps(), indent=4, ensure_ascii=False)
+            print(dump_str)
+            self.write(dump_str)
             # nice found!!!
             # do something
         self.current += 1
