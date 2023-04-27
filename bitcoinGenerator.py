@@ -96,7 +96,7 @@ if __name__ == "__main__":
     # generate(1, verbose, computer, wallets, counter)
     print("Cores on machine to be used:", mp.cpu_count())
     print("Addresses to be used:", len(wallets))
-    procs = [mp.Process(target=generate, args=(index, verbose, computer, wallets, counter,)) for index in range(10)]
+    procs = [mp.Process(target=generate, args=(index, verbose, computer, wallets, counter,)) for index in range(mp.cpu_count())]
 
     for p in procs: p.start()
     for p in procs: p.join()
