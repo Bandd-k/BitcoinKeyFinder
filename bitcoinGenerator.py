@@ -68,7 +68,7 @@ class Solver:
             self.current = 0
     
     def write(self, wallet):
-        fhand = open("/Users/deniskarpenko/Desktop/BitcoinKeyFinder/keys.txt", 'a+')
+        fhand = open("keys.txt", 'a+')
         fhand.write(str(wallet))
         fhand.write("\n###########################################\n")
         fhand.close()
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     verbose = False
     if len(sys.argv) == 2 and sys.argv[1] == "--verbose":
         verbose = True
-    fhand = open("/Users/deniskarpenko/Desktop/BitcoinKeyFinder/wallets.txt")
+    fhand = open("wallets.txt")
     wallets = set(fhand.readlines())
     fhand.close()
     computer = uuid.UUID(int=uuid.getnode())
