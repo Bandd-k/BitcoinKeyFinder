@@ -25,10 +25,11 @@ class Counter(object):
 
 class Solver:
 
-    def __init__(self, process, computer, wallets, counter, verbose=False):
+    def __init__(self, process, computer, wallets, counter, flag, verbose=False):
         self.targets = wallets
         self.verbose = verbose
         self.run = True
+        self.flag = flag
         self.process = process
         self.random_value = f"{computer}{process}"
         self.counter = counter
@@ -36,7 +37,7 @@ class Solver:
 
     def start(self):
         self.run = True
-        while self.run:
+        while self.run and self.flag.value() == 0:
             self.generate()
     
     def stop(self):
@@ -64,6 +65,7 @@ class Solver:
             dump_str = json.dumps(hdwallet.dumps(), indent=4, ensure_ascii=False)
             print(dump_str)
             self.write(dump_str)
+            self.flag.increment(1)
             # nice found!!!
             # do something
         self.current += 1
@@ -77,15 +79,16 @@ class Solver:
         fhand.write("\n###########################################\n")
         fhand.close()
 
-def generate(index, verbose, computer, wallets, counter):
+def generate(index, verbose, computer, wallets, counter, flag):
     print(f"Process Started {index}")
-    solver = Solver(index, computer, wallets, counter, verbose) 
+    solver = Solver(index, computer, wallets, counter, flag, verbose) 
     solver.start()
 
 
 if __name__ == "__main__":
     print("START")
     counter = Counter()
+    flag = Counter()
     verbose = False
     if len(sys.argv) == 2 and sys.argv[1] == "--verbose":
         verbose = True
@@ -96,7 +99,7 @@ if __name__ == "__main__":
     # generate(1, verbose, computer, wallets, counter)
     print("Cores on machine to be used:", mp.cpu_count())
     print("Addresses to be used:", len(wallets))
-    procs = [mp.Process(target=generate, args=(index, verbose, computer, wallets, counter,)) for index in range(mp.cpu_count())]
+    procs = [mp.Process(target=generate, args=(index, verbose, computer, wallets, counter, flag,)) for index in range(mp.cpu_count())]
 
     for p in procs: p.start()
     for p in procs: p.join()
